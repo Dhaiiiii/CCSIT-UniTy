@@ -6,6 +6,17 @@
   <title>CCSIT UniTy — Campus Map</title>
   <link rel="stylesheet" href="styles.css"/>
   <script defer src="script.js"></script>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <style>
+    #map {
+      height: 500px;   /* adjust height as needed */
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -21,18 +32,36 @@
 
   <main class="container">
     <h1>Campus Map</h1>
-    <p class="muted">Prototype page — integrate Google Maps later.</p>
+    <p class="muted">IAU CCSIT Female Campus — Dammam</p>
     
-    <div class="card">
-      <p>Embed your Google Map here using an iframe or JS API.</p>
-      <a class="link" href="index.html">← Back to Home</a>
-    </div>
+    <!-- Map container -->
+    <div id="map"></div>
     
+    <a class="link" href="index.html">← Back to Home</a>
   </main>
 
   <footer class="site-footer">
     <p>© 2025 CCSIT UniTy Team</p>
   </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Coordinates for CCSIT Female Campus
+    var campus = [26.3979, 50.1981];
+
+    // Initialize map
+    var map = L.map('map').setView(campus, 15);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Add marker
+    L.marker(campus).addTo(map)
+      .bindPopup("IAU CCSIT Female Campus")
+      .openPopup();
+  </script>
 </body>
-
-
+</html>
