@@ -5,18 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CCSIT UniTy — Campus Map</title>
   <link rel="stylesheet" href="styles.css"/>
-  <script defer src="script.js"></script>
-
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-  <style>
-    #map {
-      height: 500px;   /* adjust height as needed */
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-  </style>
 </head>
 <body>
   <header class="site-header">
@@ -32,36 +20,41 @@
 
   <main class="container">
     <h1>Campus Map</h1>
-    <p class="muted">IAU CCSIT Female Campus — Dammam</p>
-    
+    <p class="muted">Prototype page — Google Maps integration.</p>
+
     <!-- Map container -->
-    <div id="map"></div>
-    
-    <a class="link" href="index.html">← Back to Home</a>
+    <div id="map" style="width:100%; height:500px;"></div>
   </main>
 
   <footer class="site-footer">
     <p>© 2025 CCSIT UniTy Team</p>
   </footer>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- Google Maps API -->
   <script>
-    // Coordinates for CCSIT Female Campus
-    var campus = [26.3979, 50.1981];
+    function initMap() {
+      // Coordinates for CCSIT Female Campus
+      var campus = { lat: 26.3850339, lng: 50.1890220 };
 
-    // Initialize map
-    var map = L.map('map').setView(campus, 15);
+      // Create map centered on campus
+      var map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 16,
+        center: campus,
+      });
 
-    // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+      // Add a pin (marker) at the campus coordinates
+      new google.maps.Marker({
+        position: campus,
+        map: map,
+        title: "CCSIT Female Campus"
+      });
+    }
+  </script>
 
-    // Add marker
-    L.marker(campus).addTo(map)
-      .bindPopup("IAU CCSIT Female Campus")
-      .openPopup();
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcH0wUt-ztfBrzEaWgbwDZNOlm1SUnACQ&callback=initMap"
+    async defer>
   </script>
 </body>
 </html>
+
