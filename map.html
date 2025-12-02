@@ -1,10 +1,34 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CCSIT UniTy — Campus Map</title>
   <link rel="stylesheet" href="styles.css"/>
+  <style>
+    #map-container { position: relative; }
+    #remove-direction-btn {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      padding: 8px 12px;
+      background: #fff;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      z-index: 5;
+    }
+    .nav-btn {
+      display:inline-block;
+      margin-top:6px;
+      padding:6px 10px;
+      background:#4285f4;
+      color:white;
+      border-radius:4px;
+      font-size:14px;
+      cursor:pointer;
+      text-align:center;
+    }
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -12,7 +36,7 @@
     <button class="menu-toggle" aria-label="Toggle menu">☰</button>
     <nav class="site-nav" id="nav">
       <a href="index.html">Home</a>
-      <a href="qa.html">Q&amp;A</a>
+      <a href="qa.html">Q&A</a>
       <a href="map.html">Campus Map</a>
       <a href="clubs.html">Clubs</a>
     </nav>
@@ -20,41 +44,314 @@
 
   <main class="container">
     <h1>Campus Map</h1>
-    <p class="muted">Prototype page — Google Maps integration.</p>
+    <p class="muted">Google Maps page of The CCSIT Campus and its Facilities.</p>
 
-    <!-- Map container -->
-    <div id="map" style="width:100%; height:500px;"></div>
+    <div id="map-container">
+      <div id="map" style="width:100%; height:500px;"></div>
+      <button id="remove-direction-btn">Remove Direction</button>
+    </div>
+
+    <input id="pac-input" class="controls" type="text" placeholder="Search facilities (pins only)" style="margin-top:10px; width:100%; padding:8px;">
+
+    <select id="floor-filter" style="margin-top:10px; width:100%; padding:8px;">
+      <option value="all">All pins</option>
+      <option value="F_up">Building F — Upstairs</option>
+      <option value="F_down">Building F — Downstairs</option>
+      <option value="C_up">Building C — Upstairs</option>
+      <option value="C_down">Building C — Downstairs</option>
+      <option value="College_down">College Entrance Building</option>
+    </select>
+
+    <ul id="search-results" style="list-style:none; padding-left:0; margin-top:8px;"></ul>
   </main>
 
   <footer class="site-footer">
     <p>© 2025 CCSIT UniTy Team</p>
   </footer>
 
-  <!-- Google Maps API -->
   <script>
     function initMap() {
-      // Coordinates for CCSIT Female Campus
-      var campus = { lat: 26.3850339, lng: 50.1890220 };
 
-      // Create map centered on campus
+      var activeInfoWindow = null;  // <<<< ONLY ONE POPUP AT A TIME
+
+      var campusCenter = { lat: 26.3850339, lng: 50.1890220 };
       var map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 16,
-        center: campus,
+        zoom: 17,
+        center: campusCenter
       });
 
-      // Add a pin (marker) at the campus coordinates
-      new google.maps.Marker({
-        position: campus,
-        map: map,
-        title: "CCSIT Female Campus"
+      var facilities = [
+        {name:"Campus", lat:26.3850339, lng:50.1890220, group:"Campus"},
+
+        /* ------- YOUR FULL PIN LIST BELOW (UNCHANGED) ------- */
+        {name:"Building F Entrance", lat:26.3853499, lng:50.1897080, group:"F_down"},
+        {name:"Building Side Entrance", lat:26.3857599, lng:50.1896969, group:"F_down"},
+        {name:"Building Side Entrance", lat:26.3851291, lng:50.1900919, group:"F_down"},
+        {name:"Toilet", lat:26.3855649, lng:50.1899551, group:"F_down"},
+        {name:"Stairs", lat:26.3855911, lng:50.1899551, group:"F_down"},
+        {name:"Stairs", lat:26.3852691, lng:50.1901821, group:"F_down"},
+        {name:"Stairs", lat:26.3857671, lng:50.1898860, group:"F_down"},
+        {name:"Elevator", lat:26.3855190, lng:50.1899380, group:"F_down"},
+        {name:"Faculty Members Room", lat:26.3851009, lng:50.1899340, group:"F_down"},
+        {name:"Administration Room", lat:26.3851721, lng:50.1898941, group:"F_down"},
+        {name:"College Administration", lat:26.3852910, lng:50.1901459, group:"F_down"},
+
+        {name:"Toilet", lat:26.3855649, lng:50.1899551, group:"F_up"},
+        {name:"Stairs", lat:26.3855911, lng:50.1899551, group:"F_up"},
+        {name:"Stairs", lat:26.3852691, lng:50.1901821, group:"F_up"},
+        {name:"Stairs", lat:26.3857671, lng:50.1898860, group:"F_up"},
+        {name:"Elevator", lat:26.3855190, lng:50.1899380, group:"F_up"},
+        {name:"Mini-Market", lat:26.3856610, lng:50.1896041, group:"F_up"},
+        {name:"Events Room", lat:26.3857100, lng:50.1898699, group:"F_up"},
+        {name:"Faculty Members Room", lat:26.3853210, lng:50.1901160, group:"F_up"},
+        {name:"Examination Unit", lat:26.3853069, lng:50.1901311, group:"F_up"},
+        {name:"Administration Room", lat:26.3852931, lng:50.1901412, group:"F_up"},
+        {name:"Events Unit", lat:26.3851171, lng:50.1900349, group:"F_up"},
+        {name:"Faculty Members Room", lat:26.3851129, lng:50.1899209, group:"F_up"},
+        {name:"Faculty Members Room", lat:26.3851640, lng:50.1898870, group:"F_up"},
+        {name:"Faculty Members Room", lat:26.3852021, lng:50.1898619, group:"F_up"},
+
+        {name:"Building C Entrance", lat:26.3856100, lng:50.1892289, group:"C_down"},
+        {name:"Building Side Entrance", lat:26.3859509, lng:50.1894770, group:"C_down"},
+        {name:"Building Side Entrance", lat:26.3855971, lng:50.1887689, group:"C_down"},
+        {name:"Toilet", lat:26.3858569, lng:50.1890321, group:"C_down"},
+        {name:"Stairs", lat:26.3858530, lng:50.1890029, group:"C_down"},
+        {name:"Stairs", lat:26.3860359, lng:50.1893181, group:"C_down"},
+        {name:"Stairs", lat:26.3857671, lng:50.1887850, group:"C_down"},
+        {name:"Elevator", lat:26.3858310, lng:50.1890629, group:"C_down"},
+        {name:"Prayer Room", lat:26.3857749, lng:50.1888621, group:"C_down"},
+        {name:"Faculty Members Room", lat:26.3857671, lng:50.1894619, group:"C_down"},
+        {name:"Faculty Members Room", lat:26.3857451, lng:50.1894099, group:"C_down"},
+        {name:"Departments Administration Room", lat:26.3859830, lng:50.1892611, group:"C_down"},
+        {name:"Multipurpose Room", lat:26.3857719, lng:50.1888309, group:"C_down"},
+        {name:"Theater/Stage Room", lat:26.3855241, lng:50.1889741, group:"C_down"},
+
+        {name:"Toilet", lat:26.3858569, lng:50.1890321, group:"C_up"},
+        {name:"Stairs", lat:26.3858530, lng:50.1890029, group:"C_up"},
+        {name:"Stairs", lat:26.3860359, lng:50.1893181, group:"C_up"},
+        {name:"Stairs", lat:26.3857671, lng:50.1887850, group:"C_up"},
+        {name:"Elevator", lat:26.3858310, lng:50.1890629, group:"C_up"},
+        {name:"Mini-Market", lat:26.3855391, lng:50.1888661, group:"C_up"},
+        {name:"Study Room", lat:26.3857641, lng:50.1888390, group:"C_up"},
+        {name:"Administration Room", lat:26.3857821, lng:50.1888681, group:"C_up"},
+        {name:"Faculty Members Room", lat:26.3857761, lng:50.1894569, group:"C_up"},
+        {name:"Faculty Members Room", lat:26.3857629, lng:50.1894331, group:"C_up"},
+        {name:"Administration Room", lat:26.3859710, lng:50.1892349, group:"C_up"},
+        {name:"Administration Room", lat:26.3859929, lng:50.1892869, group:"C_up"},
+
+        {name:"College Entrance", lat:26.3849970, lng:50.1889409, group:"College_down"},
+        {name:"College Entrance", lat:26.3850781, lng:50.1891990, group:"College_down"},
+        {name:"Toilet", lat:26.3849711, lng:50.1891940, group:"College_down"},
+        {name:"Prayer Room", lat:26.3850850, lng:50.1889509, group:"College_down"},
+        {name:"Vending Machine", lat:26.3850790, lng:50.1890039, group:"College_down"}
+      ];
+
+      var iconColors = {
+        F_up:"red", F_down:"orange",
+        C_up:"blue", C_down:"green",
+        College_down:"purple"
+      };
+
+      function pinIcon(color) {
+        return {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: color,
+          fillOpacity:0.9,
+          strokeColor:"#222",
+          strokeWeight:1,
+          scale:6
+        };
+      }
+
+      var markers = facilities.map(function(place) {
+
+        var markerOptions = {
+          position: {lat: place.lat, lng: place.lng},
+          map: map,
+          title: place.name
+        };
+
+        if (place.group !== "Campus") {
+          markerOptions.icon = pinIcon(iconColors[place.group] || "red");
+        }
+
+        var marker = new google.maps.Marker(markerOptions);
+        marker._group = place.group;
+        marker._name = place.name;
+        marker._latlng = new google.maps.LatLng(place.lat, place.lng);
+
+        /* ------- CAMPUS PIN POPUP + NAVIGATION ------- */
+        if (place.group === "Campus") {
+
+          var html = `
+            <b>Campus</b><br>
+            <div class="nav-btn"
+              onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}', '_blank')">
+              Navigate to Campus
+            </div>
+          `;
+
+          var campusWindow = new google.maps.InfoWindow({ content: html });
+
+          marker.addListener("click", function() {
+
+            if(activeInfoWindow) activeInfoWindow.close();
+            activeInfoWindow = campusWindow;
+
+            campusWindow.open(map, marker);
+          });
+
+          return marker;
+        }
+
+        /* ------- NORMAL PINS ------- */
+        var info = new google.maps.InfoWindow({
+          content: "<b>"+place.name+"</b><br><small>"+labelForGroup(place.group)+"</small>"
+        });
+
+        marker.addListener("click", function() {
+
+          if(activeInfoWindow) activeInfoWindow.close();
+          activeInfoWindow = info;
+
+          info.open(map, marker);
+        });
+
+        return marker;
       });
+
+
+
+      function labelForGroup(g) {
+        if(g==="F_up") return "Building F — Upstairs";
+        if(g==="F_down") return "Building F — Downstairs";
+        if(g==="C_up") return "Building C — Upstairs";
+        if(g==="C_down") return "Building C — Downstairs";
+        if(g==="College_down") return "College Entrance Building";
+        if(g==="Campus") return "Campus";
+        return "Unknown";
+      }
+
+      /* ------- FILTER ------- */
+      var filterEl = document.getElementById("floor-filter");
+      filterEl.addEventListener("change", function() {
+        var val = filterEl.value;
+        markers.forEach(function(m) {
+          m.setVisible(val==="all" || m._group===val);
+        });
+      });
+
+      /* ------- SEARCH ------- */
+      var searchInput = document.getElementById("pac-input");
+      var resultsEl = document.getElementById("search-results");
+
+      function currentFilter() {
+        var v = filterEl.value;
+        return v==="all" ? null : v;
+      }
+
+      searchInput.addEventListener("input", function() {
+        var q = searchInput.value.trim().toLowerCase();
+        resultsEl.innerHTML = "";
+        if(!q) return;
+
+        var groupFilter = currentFilter();
+        var matches = markers.filter(m =>
+          m._name.toLowerCase().includes(q) &&
+          (!groupFilter || m._group===groupFilter)
+        ).slice(0,8);
+
+        matches.forEach(function(m){
+          var li = document.createElement("li");
+          li.textContent = m._name+" — "+labelForGroup(m._group);
+          li.style.cursor = "pointer";
+          li.style.padding = "6px 8px";
+          li.style.border = "1px solid #eee";
+          li.style.marginBottom = "4px";
+
+          li.addEventListener("click", function(){
+            map.panTo(m._latlng);
+            map.setZoom(19);
+
+            if(activeInfoWindow) activeInfoWindow.close();
+
+            var iw = new google.maps.InfoWindow({
+              content:"<b>"+m._name+"</b><br><small>"+labelForGroup(m._group)+"</small>"
+            });
+
+            activeInfoWindow = iw;
+            iw.open(map,m);
+
+            resultsEl.innerHTML = "";
+          });
+
+          resultsEl.appendChild(li);
+        });
+      });
+
+
+      /* ------- DIRECTION LINES ------- */
+      var selected = [];
+
+      markers.forEach(function(marker){
+        marker.addListener("dblclick", function(){
+
+          if(marker._group==="Campus") return;
+
+          if(selected.length===0){
+            selected.push(marker);
+            return;
+          }
+
+          var first = selected[0];
+
+          function getBuilding(g){ return g.split("_")[0]; }
+          var b1 = getBuilding(first._group);
+          var b2 = getBuilding(marker._group);
+
+          if(b1 !== b2){
+            alert("Notice: You can only create directions within the same building.");
+            selected = [];
+            return;
+          }
+
+          if(first._group !== marker._group){
+            alert("Notice: You can only create directions within the same floor.");
+            selected = [];
+            return;
+          }
+
+          selected.push(marker);
+
+          if(window.customPath)
+            window.customPath.setMap(null);
+
+          window.customPath = new google.maps.Polyline({
+            path:[ first._latlng, marker._latlng ],
+            geodesic:false,
+            strokeColor:"#ff0000",
+            strokeOpacity:1.0,
+            strokeWeight:4
+          });
+
+          window.customPath.setMap(map);
+          selected = [];
+        });
+      });
+
+      /* ------- REMOVE DIRECTION BUTTON ------- */
+      var clearBtn = document.getElementById("remove-direction-btn");
+      clearBtn.addEventListener("click", function(){
+        if(window.customPath) {
+          window.customPath.setMap(null);
+          window.customPath = null;
+          selected = [];
+        }
+      });
+
     }
   </script>
 
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcH0wUt-ztfBrzEaWgbwDZNOlm1SUnACQ&callback=initMap"
-    async defer>
-  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcH0wUt-ztfBrzEaWgbwDZNOlm1SUnACQ&callback=initMap" async defer></script>
 </body>
 </html>
-
