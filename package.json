@@ -1,0 +1,25 @@
+{
+  "name": "ccsit-unity-home-starter",
+  "version": "1.0.0",
+  "description": "A web-based platform developed by CCSIT students at Imam Abdulrahman Bin Faisal University. The project aims to assist students—especially new ones—in exploring the campus, accessing key resources, asking questions, and engaging with student clubs.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dhaiiiii/CCSIT-UniTy.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Dhaiiiii/CCSIT-UniTy/issues"
+  },
+  "homepage": "https://github.com/Dhaiiiii/CCSIT-UniTy#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.2.1"
+  }
+}
