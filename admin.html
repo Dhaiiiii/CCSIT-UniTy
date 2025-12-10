@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CCSIT UniTy – Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --fg: #e8eef5;
+      --muted: #a9b4c2;
+      --brand: #7cc4ff;
+      --card: #121821;
+      --outline: #223045;
+      --danger: #ef4444;
+      --success: #22c55e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: var(--bg);
+      color: var(--fg);
+    }
+
+    .app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    .header {
+      border-bottom: 1px solid var(--outline);
+      background: var(--bg);
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: .04em;
+    }
+
+    .logo span { color: var(--brand); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .85rem;
+      color: var(--muted);
+    }
+
+    .header-actions a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    .header-actions a:hover {
+      text-decoration: underline;
+    }
+
+    .pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--outline);
+      font-size: .75rem;
+      color: var(--muted);
+    }
+
+    /* LAYOUT */
+    .page-container {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 26px 24px 32px;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .page-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .sidebar {
+      background: #050814;
+      border-radius: 16px;
+      border: 1px solid var(--outline);
+      padding: 16px 14px;
+    }
+
+    .sidebar-title {
+      font-size: .9rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .sidebar-item {
+      width: 100%;
+      text-align: left;
+      border: none;
+      background: transparent;
+      color: var(--fg);
+      font-size: .9rem;
+      padding: 8px 10px;
+      border-radius: 10px;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    .sidebar-item span.badge {
+      font-size: .7rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #0f1723;
+      color: var(--muted);
+    }
+
+    .sidebar-item.active {
+      background: var(--brand);
+      color: #020617;
+    }
+
+    .sidebar-item.active span.badge {
+      background: #020617;
+      color: #e5f3ff;
+    }
+
+    .sidebar-item:hover:not(.active) {
+      background: #0f1723;
+    }
+
+    /* MAIN */
+    .main-area {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .page-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .page-subtitle {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    /* CARDS & TABLES */
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--outline);
+      padding: 16px 18px 18px;
+      box-shadow: 0 16px 32px rgba(0,0,0,0.35);
+    }
+
+    .card-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .card-subtitle {
+      font-size: .8rem;
+      color: var(--muted);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stat-card {
+      background: #050814;
+      border-radius: 13px;
+      border: 1px solid var(--outline);
+      padding: 10px 12px;
+    }
+
+    .stat-label {
+      font-size: .8rem;
+      color: var(--muted);
+    }
+
+    .stat-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .stat-pill {
+      font-size: .7rem;
+      color: #bbf7d0;
+      background: rgba(22,163,74,0.18);
+      border-radius: 999px;
+      padding: 2px 7px;
+      margin-top: 6px;
+      display: inline-block;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: .85rem;
+    }
+
+    .table th,
+    .table td {
+      text-align: left;
+      padding: 6px 4px;
+    }
+
+    .table th {
+      color: var(--muted);
+      font-weight: 500;
+      border-bottom: 1px solid var(--outline);
+    }
+
+    .table tr:not(:last-child) td {
+      border-bottom: 1px solid rgba(15,23,42,0.7);
+    }
+
+    .chip {
+      font-size: .75rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid var(--outline);
+      color: var(--muted);
+    }
+
+    .chip.green {
+      border-color: rgba(34,197,94,0.5);
+      color: #4ade80;
+    }
+
+    .chip.red {
+      border-color: rgba(239,68,68,0.5);
+      color: #fca5a5;
+    }
+
+    .btn-secondary {
+      border-radius: 999px;
+      border: 1px solid var(--outline);
+      background: #020617;
+      color: var(--fg);
+      font-size: .8rem;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background: #0f1723;
+    }
+
+    .btn-small {
+      font-size: .75rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--outline);
+      background: #020617;
+      color: var(--fg);
+      cursor: pointer;
+    }
+
+    .btn-small.danger {
+      border-color: rgba(239,68,68,0.7);
+      color: #fecaca;
+    }
+
+    .btn-small:hover {
+      background: #0f1723;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+      margin-top: 4px;
+    }
+
+    .input {
+      flex: 1;
+      padding: 7px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--outline);
+      background: #020617;
+      color: var(--fg);
+      font-size: .8rem;
+      outline: none;
+    }
+
+    .input::placeholder {
+      color: #6b7280;
+    }
+
+    .input:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 1px rgba(124,196,255,0.35);
+    }
+
+    .section-hidden {
+      display: none;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-right: 4px;
+    }
+
+    .badge-dot.red { background: #ef4444; }
+    .badge-dot.orange { background: #f97316; }
+    .badge-dot.blue { background: #3b82f6; }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo">CCSIT <span>UniTy</span></div>
+
+        <div class="header-actions">
+          <span class="pill">Admin Panel</span>
+          <a href="index.html">Back to main site</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- LAYOUT -->
+    <div class="page-container">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-title">Admin sections</div>
+
+        <button class="sidebar-item active" data-target="overview">
+          Overview
+          <span class="badge">Today</span>
+        </button>
+
+        <button class="sidebar-item" data-target="users">
+          Users
+          <span class="badge">134</span>
+        </button>
+
+        <button class="sidebar-item" data-target="communities">
+          Communities
+          <span class="badge">6</span>
+        </button>
+
+        <button class="sidebar-item" data-target="reports">
+          Reports & moderation
+          <span class="badge">3</span>
+        </button>
+
+        <button class="sidebar-item" data-target="map">
+          Campus map data
+          <span class="badge">Pins</span>
+        </button>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="main-area">
+        <div class="page-heading">
+          <h1 class="page-title">Admin dashboard</h1>
+          <span class="page-subtitle">Monitor activity and manage CCSIT UniTy content.</span>
+        </div>
+
+        <!-- OVERVIEW -->
+        <section id="section-overview" class="card">
+          <div class="card-title-row">
+            <div>
+              <div class="card-title">Overview</div>
+              <div class="card-subtitle">High-level stats for today.</div>
+            </div>
+            <button class="btn-secondary">Export snapshot</button>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Active users</div>
+              <div class="stat-value">134</div>
+              <div class="stat-pill">+12 today</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Communities</div>
+              <div class="stat-value">6</div>
+              <div class="stat-pill">2 new this week</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Questions (Q&A)</div>
+              <div class="stat-value">48</div>
+              <div class="stat-pill">5 awaiting review</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">Reports</div>
+              <div class="stat-value">3</div>
+              <div class="stat-pill" style="background:rgba(239,68,68,0.18);color:#fecaca;">
+                1 high priority
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- USERS -->
+        <section id="section-users" class="card section-hidden">
+          <div class="card-title-row">
+            <div>
+              <div class="card-title">Users</div>
+              <div class="card-subtitle">View and manage CCSIT UniTy accounts.</div>
+            </div>
+            <button class="btn-secondary">Add user (demo)</button>
+          </div>
+
+          <div class="search-row">
+            <input class="input" type="text" placeholder="Search by name, email, or ID (demo only)" />
+            <button class="btn-secondary">Filter</button>
+          </div>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Student ID</th>
+                <th>Major</th>
+                <th>Level</th>
+                <th>Status</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Razan Al-Student</td>
+                <td>441234567</td>
+                <td>IT</td>
+                <td>7</td>
+                <td><span class="chip green">Active</span></td>
+                <td style="text-align:right;">
+                  <button class="btn-small">View</button>
+                  <button class="btn-small danger">Suspend</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Lama Dev</td>
+                <td>441112233</td>
+                <td>CS</td>
+                <td>5</td>
+                <td><span class="chip green">Active</span></td>
+                <td style="text-align:right;">
+                  <button class="btn-small">View</button>
+                  <button class="btn-small danger">Suspend</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Norah Tester</td>
+                <td>441998877</td>
+                <td>Cybersecurity</td>
+                <td>3</td>
+                <td><span class="chip red">Suspended</span></td>
+                <td style="text-align:right;">
+                  <button class="btn-small">View</button>
+                  <button class="btn-small">Reactivate</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- COMMUNITIES -->
+        <section id="section-communities" class="card section-hidden">
+          <div class="card-title-row">
+            <div>
+              <div class="card-title">Communities</div>
+              <div class="card-subtitle">Manage student communities and clubs.</div>
+            </div>
+            <button class="btn-secondary">Create community (demo)</button>
+          </div>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Community</th>
+                <th>Type</th>
+                <th>Members</th>
+                <th>Threads</th>
+                <th>Status</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Web Development Community</td>
+                <td><span class="chip">Academic</span></td>
+                <td>124</td>
+                <td>8</td>
+                <td><span class="chip green">Active</span></td>
+                <td style="text-align:right;">
+                  <button class="btn-small">Open</button>
+                  <button class="btn-small danger">Archive</button>
+                </td>
+              </tr>
+              <tr>
+                <td>AI & Machine Learning</td>
+                <td><span class="chip">Academic</span></td>
+                <td>89</td>
+                <td>5</td>
+                <td><span class="chip green">Active</span></td>
+                <td style="text-align:right;">
+                  <button class="btn-small">Open</button>
+                  <button class="btn-small danger">Archive</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Cybersecurity Club</td>
+                <td><span class="chip">Club</span></td>
+                <td>63</td>
+                <td>3</td>
+                <td><span class="chip green">Active</span></td>
+                <td style="text-align:right;">
+                  <button class="btn-small">Open</button>
+                  <button class="btn-small danger">Archive</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- REPORTS -->
+        <section id="section-reports" class="card section-hidden">
+          <div class="card-title-row">
+            <div>
+              <div class="card-title">Reports & moderation</div>
+              <div class="card-subtitle">Handle flagged posts, comments, and users.</div>
+            </div>
+            <button class="btn-secondary">Mark all as reviewed</button>
+          </div>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Item</th>
+                <th>Reason</th>
+                <th>Reporter</th>
+                <th>Age</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <span class="badge-dot red"></span>
+                  Post
+                </td>
+                <td>Q&A: "Exam schedule question"</td>
+                <td>Inaccurate information</td>
+                <td>441223344</td>
+                <td>2h</td>
+                <td style="text-align:right;">
+                  <button class="btn-small">View</button>
+                  <button class="btn-small danger">Remove</button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="badge-dot.orange"></span>
+                  Comment
+                </td>
+                <td>Comment in "Cybersecurity Club"</td>
+                <td>Off-topic</td>
+                <td>441555666</td>
+                <td>5h</td>
+                <td style="text-align:right;">
+                  <button class="btn-small">View</button>
+                  <button class="btn-small">Dismiss</button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="badge-dot blue"></span>
+                  User
+                </td>
+                <td>User: Norah Tester</td>
+                <td>Multiple warnings</td>
+                <td>System</td>
+                <td>1d</td>
+                <td style="text-align:right;">
+                  <button class="btn-small danger">Suspend</button>
+                  <button class="btn-small">View history</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- MAP DATA -->
+        <section id="section-map" class="card section-hidden">
+          <div class="card-title-row">
+            <div>
+              <div class="card-title">Campus map data</div>
+              <div class="card-subtitle">
+                Manage buildings and pins used in the campus map feature. (Demo only)
+              </div>
+            </div>
+            <button class="btn-secondary">Sync with map</button>
+          </div>
+
+          <div class="search-row">
+            <input class="input" type="text" placeholder="Search pins by name or building (demo only)" />
+            <button class="btn-secondary">Filter</button>
+          </div>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Pin name</th>
+                <th>Building</th>
+                <th>Floor / Group</th>
+                <th>Type</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Mini-Market</td>
+                <td>F</td>
+                <td>F_up</td>
+                <td><span class="chip">Facility</span></td>
+                <td style="text-align:right;">
+                  <button class="btn-small">Edit</button>
+                  <button class="btn-small danger">Remove</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Prayer Room</td>
+                <td>C</td>
+                <td>C_down</td>
+                <td><span class="chip">Facility</span></td>
+                <td style="text-align:right;">
+                  <button class="btn-small">Edit</button>
+                  <button class="btn-small danger">Remove</button>
+                </td>
+              </tr>
+              <tr>
+                <td>College Entrance</td>
+                <td>College</td>
+                <td>College_down</td>
+                <td><span class="chip">Entrance</span></td>
+                <td style="text-align:right;">
+                  <button class="btn-small">Edit</button>
+                  <button class="btn-small danger">Remove</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer" style="border-top:1px solid var(--outline);color:var(--muted);padding:16px;text-align:center;font-size:.8rem;">
+      © 2025 CCSIT UniTy Team — Admin View (Demo)
+    </footer>
+  </div>
+
+  <script>
+    // تبديل أقسام الأدمن حسب الزر في القائمة الجانبية
+    const sidebarButtons = document.querySelectorAll('.sidebar-item');
+    const sections = {
+      overview: document.getElementById('section-overview'),
+      users: document.getElementById('section-users'),
+      communities: document.getElementById('section-communities'),
+      reports: document.getElementById('section-reports'),
+      map: document.getElementById('section-map')
+    };
+
+    sidebarButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-target');
+
+        // فعّل الزر الحالي
+        sidebarButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // أظهر القسم المطلوب وأخفِ البقية
+        Object.keys(sections).forEach(key => {
+          if (key === target) {
+            sections[key].classList.remove('section-hidden');
+          } else {
+            sections[key].classList.add('section-hidden');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
