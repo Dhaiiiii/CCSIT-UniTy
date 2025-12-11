@@ -242,12 +242,6 @@
       <div class="header-inner">
         <div class="logo">CCSIT <span>UniTy</span></div>
 
-        <nav class="nav">
-          <a href="index.html" class="nav-link">Home</a>
-          <a href="communities.html" class="nav-link">Communities</a>
-          <a href="map.html" class="nav-link">Campus Map</a>
-          <a href="login.html" class="nav-link active">Login</a>
-        </nav>
       </div>
     </header>
 
@@ -310,44 +304,73 @@
       © 2025 CCSIT UniTy Team — Student Project
     </footer>
   </div>
+<script>
+  const loginForm = document.getElementById('loginForm');
+  const emailInput = document.getElementById('loginEmail');
+  const passwordInput = document.getElementById('loginPassword');
+  const emailError = document.getElementById('emailError');
+  const passwordError = document.getElementById('passwordError');
+  const globalError = document.getElementById('loginGlobalError');
 
-  <script>
-    const loginForm = document.getElementById('loginForm');
-    const emailInput = document.getElementById('loginEmail');
-    const passwordInput = document.getElementById('loginPassword');
-    const emailError = document.getElementById('emailError');
-    const passwordError = document.getElementById('passwordError');
-    const globalError = document.getElementById('loginGlobalError');
+  function isCCSITEmail(value) {
+    return /@.+\./.test(value); // ممكن تشددها لـ /@ccsit\.edu\.sa$/ لو حبيت
+  }
 
-    function isCCSITEmail(value) {
-      return /@.+\./.test(value); // ممكن تشددونها لاحقاً لـ @ccsit.edu.sa
+  loginForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    let valid = true;
+
+    emailError.style.display = 'none';
+    passwordError.style.display = 'none';
+    globalError.style.display = 'none';
+
+    if (!emailInput.value || !isCCSITEmail(emailInput.value)) {
+      emailError.style.display = 'block';
+      valid = false;
     }
 
-    loginForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      let valid = true;
+    if (!passwordInput.value) {
+      passwordError.style.display = 'block';
+      valid = false;
+    }
 
-      emailError.style.display = 'none';
-      passwordError.style.display = 'none';
-      globalError.style.display = 'none';
+    if (!valid) return;
 
-      if (!emailInput.value || !isCCSITEmail(emailInput.value)) {
-        emailError.style.display = 'block';
-        valid = false;
+    try {
+      // 🔗 هنا نرسل البيانات لملف الـ PHP
+      const res = await fetch('http://localhost/ccsit_unity/login.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          email: emailInput.value,
+          password: passwordInput.value
+        })
+      });
+
+      const text = await res.text();
+      console.log('Response from server:', text);
+
+      if (text.trim() === 'SUCCESS') {
+        // تسجيل دخول ناجح
+        localStorage.setItem('isLoggedIn', 'true');
+        window.location.href = 'index.html'; // يوديك على الصفحة الثانية
+      } else if (text.trim() === 'INVALID') {
+        globalError.textContent = 'Invalid email or password.';
+        globalError.style.display = 'block';
+      } else {
+        globalError.textContent = 'Server error, please try again later.';
+        globalError.style.display = 'block';
       }
+    } catch (err) {
+      console.error(err);
+      globalError.textContent = 'Cannot connect to server.';
+      globalError.style.display = 'block';
+    }
+  });
+</script>
 
-      if (!passwordInput.value) {
-        passwordError.style.display = 'block';
-        valid = false;
-      }
-
-      if (!valid) return;
-
-      // ديمو فقط – هنا في الحقيقي نتصل بالباك اند
-      localStorage.setItem('isLoggedIn', 'true');
-      window.location.href = 'index.html';
-    });
-  </script>
 
 
 
