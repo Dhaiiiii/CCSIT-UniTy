@@ -388,11 +388,11 @@
       global: document.getElementById('signupGlobalError')
     };
 
-    function isEmailValid(email) {
-      return /@.+\./.test(email); // ممكن تبدلينها لاحقاً لـ @ccsit.edu.sa فقط
+    function isValidEmail(email) {
+      return /@.+\./.test(email); // Basic email validation
     }
 
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', async function (e) {
       e.preventDefault();
       let valid = true;
 
@@ -419,7 +419,7 @@
         valid = false;
       }
 
-      if (!fields.email.value || !isEmailValid(fields.email.value)) {
+      if (!fields.email.value || !isValidEmail(fields.email.value)) {
         errors.email.style.display = 'block';
         valid = false;
       }
@@ -444,8 +444,8 @@
         return;
       }
 
-      // ديمو فقط
-      alert("Account created successfully (demo). Please login.");
+      // Simulate successful sign-up for demo purposes
+      alert("Account created successfully! Please login with your credentials.");
       window.location.href = "login.html";
     });
   </script>

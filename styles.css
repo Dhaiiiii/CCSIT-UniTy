@@ -5,18 +5,23 @@
 }
 
 :root {
-    /* Updated color scheme based on the provided image */
-    --primary-color: #00A3FF;
-    --primary-dark: #0077CC;
+    --bg: #0b0f14;
+    --fg: #e8eef5;
+    --muted: #a9b4c2;
+    --brand: #7cc4ff;
+    --card: #121821;
+    --outline: #223045;
+    --primary-color: #7cc4ff;
+    --primary-dark: #5aa8e6;
     --secondary-color: #2ECC71;
     --accent-color: #E74C3C;
-    --background: #0A1929;
-    --card-bg: #132F4C;
-    --card-bg-light: #1A3A52;
-    --text-primary: #FFFFFF;
-    --text-secondary: #B2BAC2;
-    --border-color: #1E3A52;
-    --hover-bg: #1A3A52;
+    --background: #0b0f14;
+    --card-bg: #121821;
+    --card-bg-light: #1a2332;
+    --text-primary: #e8eef5;
+    --text-secondary: #a9b4c2;
+    --border-color: #223045;
+    --hover-bg: #1a2332;
     --warning-color: #FFA726;
 }
 

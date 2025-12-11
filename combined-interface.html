@@ -4,197 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Communities</title>
-    <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Additional styles for community discovery section */
-        .discovery-section {
-            background-color: var(--card-bg-light);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .discovery-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .discovery-header h3 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .discovery-filters {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .discovery-search {
-            flex: 1;
-            min-width: 240px;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background-color: var(--background);
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 0.95rem;
-        }
-
-        .discovery-search:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .discovery-select {
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background-color: var(--background);
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 0.95rem;
-            cursor: pointer;
-        }
-
-        .discovery-select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .discovery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .discovery-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: all 0.2s;
-        }
-
-        .discovery-card:hover {
-            box-shadow: 0 4px 12px rgba(0,163,255,0.2);
-            border-color: var(--primary-color);
-        }
-
-        .discovery-card-header {
-            margin-bottom: 1rem;
-        }
-
-        .discovery-card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .discovery-card-meta {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .discovery-card-type {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            background-color: rgba(0, 163, 255, 0.2);
-            color: var(--primary-color);
-        }
-
-        .discovery-card-description {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            line-height: 1.6;
-            font-size: 0.9rem;
-        }
-
-        .discovery-card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .discovery-view-link {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .discovery-view-link:hover {
-            text-decoration: underline;
-        }
-
-        .toggle-discovery-btn {
-            background-color: var(--hover-bg);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .toggle-discovery-btn:hover {
-            background-color: var(--card-bg-light);
-            border-color: var(--primary-color);
-        }
-
-        @media (max-width: 968px) {
-            .discovery-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-        }
-
-        @media (max-width: 640px) {
-            .discovery-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .discovery-filters {
-                flex-direction: column;
-            }
-
-            .discovery-search {
-                width: 100%;
-            }
-        }
-    </style>
+    <link href="styles.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Header -->
+  <div class="app">
+    <!-- HEADER -->
     <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <h1 class="logo">Student Communities</h1>
-                <div class="user-info">
-                    <span id="currentUserName">User</span>
-                    <button id="logoutBtn" class="btn-secondary">Logout</button>
-                </div>
-            </div>
-        </div>
+      <div class="header-inner">
+        <div class="logo">CCSIT <span>UniTy</span></div>
+
+        <nav class="nav">
+          <a href="./index.html" class="nav-link">Home</a>
+          <a href="./combined-interface.html" class="nav-link active">Communities</a>
+          <a href="./map.html" class="nav-link">Campus Map</a>
+          <a href="./profile.html" class="nav-link">Profile</a>
+        </nav>
+      </div>
     </header>
 
-    <!-- Main Container -->
-    <div class="container main-container">
+    <!-- MAIN -->
+    <main class="page-container">
+      <div class="container main-container">
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -232,12 +63,12 @@
                         <h3>Discover Communities</h3>
                         <button id="toggleDiscoveryBtn" class="toggle-discovery-btn">Hide Discovery</button>
                     </div>
-                    
+
                     <div class="discovery-filters">
-                        <input 
-                            type="text" 
-                            id="discoverySearch" 
-                            class="discovery-search" 
+                        <input
+                            type="text"
+                            id="discoverySearch"
+                            class="discovery-search"
                             placeholder="Search communities..."
                         />
                         <select id="discoveryTypeFilter" class="discovery-select">
@@ -273,7 +104,14 @@
                 </div>
             </div>
         </main>
-    </div>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      © 2025 CCSIT UniTy Team
+    </footer>
+  </div>
 
     <!-- Modal: Create Community -->
     <div id="createCommunityModal" class="modal">

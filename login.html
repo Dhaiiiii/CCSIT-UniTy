@@ -253,14 +253,14 @@
 
         <form id="loginForm">
           <div class="form-field">
-            <label for="loginEmail" class="form-label">University email</label>
+            <label for="loginEmail" class="form-label">Email</label>
             <input
               id="loginEmail"
               type="email"
               class="form-input"
-              placeholder="example@ccsit.edu.sa"
+              placeholder="example@gmail.com"
             />
-            <div class="field-error" id="emailError">Please enter a valid CCSIT email.</div>
+            <div class="field-error" id="emailError">Please enter a valid email.</div>
           </div>
 
           <div class="form-field">
@@ -287,6 +287,8 @@
 
           <button type="submit" class="btn-primary">Login</button>
 
+          <button type="button" id="testServerBtn" class="btn-primary" style="margin-top: 8px; background: #6b7280;">Test Server Connection</button>
+
           <div class="form-global-error" id="loginGlobalError">
             Invalid email or password (demo validation).
           </div>
@@ -311,9 +313,10 @@
   const emailError = document.getElementById('emailError');
   const passwordError = document.getElementById('passwordError');
   const globalError = document.getElementById('loginGlobalError');
+  const testServerBtn = document.getElementById('testServerBtn');
 
-  function isCCSITEmail(value) {
-    return /@.+\./.test(value); // ممكن تشددها لـ /@ccsit\.edu\.sa$/ لو حبيت
+  function isValidEmail(value) {
+    return /@.+\./.test(value); // Basic email validation
   }
 
   loginForm.addEventListener('submit', async function (e) {
@@ -324,7 +327,7 @@
     passwordError.style.display = 'none';
     globalError.style.display = 'none';
 
-    if (!emailInput.value || !isCCSITEmail(emailInput.value)) {
+    if (!emailInput.value || !isValidEmail(emailInput.value)) {
       emailError.style.display = 'block';
       valid = false;
     }
@@ -336,38 +339,10 @@
 
     if (!valid) return;
 
-    try {
-      // 🔗 هنا نرسل البيانات لملف الـ PHP
-      const res = await fetch('http://localhost/ccsit_unity/login.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-          email: emailInput.value,
-          password: passwordInput.value
-        })
-      });
-
-      const text = await res.text();
-      console.log('Response from server:', text);
-
-      if (text.trim() === 'SUCCESS') {
-        // تسجيل دخول ناجح
-        localStorage.setItem('isLoggedIn', 'true');
-        window.location.href = 'index.html'; // يوديك على الصفحة الثانية
-      } else if (text.trim() === 'INVALID') {
-        globalError.textContent = 'Invalid email or password.';
-        globalError.style.display = 'block';
-      } else {
-        globalError.textContent = 'Server error, please try again later.';
-        globalError.style.display = 'block';
-      }
-    } catch (err) {
-      console.error(err);
-      globalError.textContent = 'Cannot connect to server.';
-      globalError.style.display = 'block';
-    }
+    // Simulate successful login for demo purposes
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('userData', JSON.stringify({ email: emailInput.value, name: 'Demo User' }));
+    window.location.href = 'index.html';
   });
 </script>
 
