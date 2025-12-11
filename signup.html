@@ -5,6 +5,7 @@
   <title>CCSIT UniTy – Sign up</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="ai-widget.css" rel="stylesheet">
 
   <style>
     :root {
@@ -444,7 +445,21 @@
         return;
       }
 
-      // Simulate successful sign-up for demo purposes
+      // Store user data for demo purposes
+      const userData = {
+        id: Date.now(),
+        name: fields.fullName.value.trim(),
+        email: fields.email.value,
+        studentId: fields.studentId.value.trim(),
+        major: fields.major.value,
+        level: fields.level.value,
+        password: fields.password.value,
+        role: "student"
+      };
+
+      // Store in localStorage
+      localStorage.setItem('userData', JSON.stringify(userData));
+
       alert("Account created successfully! Please login with your credentials.");
       window.location.href = "login.html";
     });

@@ -5,6 +5,7 @@
   <title>CCSIT UniTy – Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="ai-widget.css" rel="stylesheet">
 
   <style>
     :root {
@@ -339,15 +340,91 @@
 
     if (!valid) return;
 
-    // Simulate successful login for demo purposes
-    localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('userData', JSON.stringify({ email: emailInput.value, name: 'Demo User' }));
-    window.location.href = 'index.html';
+    // Hardcoded admin login
+    if (emailInput.value === 'admin@aiu.edu.sa' && passwordInput.value === 'admin123') {
+      const adminUser = {
+        id: 2,
+        name: 'Admin User',
+        email: emailInput.value,
+        role: 'admin'
+      };
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('currentUser', JSON.stringify(adminUser));
+      window.location.href = 'admin.html';
+      return;
+    }
+
+    // Check against stored user data for demo purposes
+    const storedUserData = localStorage.getItem('userData');
+
+    if (storedUserData) {
+      const userData = JSON.parse(storedUserData);
+
+      // Check if email matches and password is correct
+      if (userData.email === emailInput.value && userData.password === passwordInput.value) {
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+        if (userData.role === 'admin') {
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'index.html';
+        }
+      } else {
+        globalError.textContent = 'Invalid email or password.';
+        globalError.style.display = 'block';
+      }
+    } else {
+      // Fallback for demo - any @ccsit.edu.sa for student
+      if (emailInput.value.endsWith('@ccsit.edu.sa')) {
+        const demoUser = {
+          id: 1,
+          name: 'Demo User',
+          email: emailInput.value,
+          studentId: '44123456',
+          major: 'Computer Science',
+          level: 3,
+          role: 'student'
+        };
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('currentUser', JSON.stringify(demoUser));
+        window.location.href = 'index.html';
+      } else {
+        globalError.textContent = 'Please create an account first or use a @ccsit.edu.sa email.';
+        globalError.style.display = 'block';
+      }
+    }
   });
 </script>
 
+<!-- AI Assistant Widget -->
+<button id="ai-toggle-button" class="ai-floating-button" aria-label="Open AI assistant">
+  💬
+</button>
 
+<div id="ai-assistant-widget">
+  <div class="ai-widget-header">
+    <div class="ai-widget-title">
+      <h2>CCSIT AI Assistant</h2>
+      <span>اسألي عن أي شيء يخص الجامعة أو CCSIT</span>
+    </div>
+    <span class="ai-widget-badge">Beta</span>
+    <button id="ai-close-button" class="ai-close">&times;</button>
+  </div>
 
+  <div class="ai-messages" id="ai-messages"></div>
+
+  <form class="ai-input-row" id="ai-chat-form">
+    <input
+      id="ai-question-input"
+      type="text"
+      placeholder="اكتبي سؤالك هنا…"
+      autocomplete="off"
+    />
+    <button id="ai-send-btn" type="submit">إرسال</button>
+  </form>
+</div>
+
+<script src="ai-widget.js"></script>
 
 </body>
 </html>

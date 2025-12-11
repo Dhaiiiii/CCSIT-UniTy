@@ -5,6 +5,7 @@
   <title>CCSIT UniTy – Profile</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="ai-widget.css" />
 
   <style>
     :root {
@@ -377,18 +378,18 @@
           <section class="card">
             <div class="profile-summary">
               <div class="avatar" id="avatar">
-                <span id="avatarInitial">R</span>
+                <span id="avatarInitial">D</span>
                 <img id="avatarImage" alt="Profile photo" />
               </div>
               <div>
-                <div class="user-name">Razan Al-Student</div>
-                <div class="user-role">CCSIT Student · IT Department</div>
+                <div class="user-name" id="userName">Demo User</div>
+                <div class="user-role" id="userRole">CCSIT Student · Computer Science</div>
               </div>
             </div>
 
-            <div class="user-meta">Email: razan.students@ccsit.edu.sa</div>
-            <div class="user-meta">ID: 441234567</div>
-            <div class="user-meta">Level: 7th level</div>
+            <div class="user-meta" id="userEmail">Email: demo@ccsit.edu.sa</div>
+            <div class="user-meta" id="userId">ID: 44123456</div>
+            <div class="user-meta" id="userLevel">Level: 3rd level</div>
 
             <div class="avatar-actions">
               <button class="btn-small" id="changePhotoBtn">Change photo</button>
@@ -475,6 +476,17 @@
   // مفتاح التخزين في المتصفح
   const STORAGE_KEY = 'ccsit_profile';
 
+  // Load current user data from localStorage
+  let currentUser = null;
+  const storedUser = localStorage.getItem('currentUser');
+  if (storedUser) {
+    try {
+      currentUser = JSON.parse(storedUser);
+    } catch (e) {
+      console.error('Error loading current user data:', e);
+    }
+  }
+
   // قيم افتراضية
   let profile = {
     fullName: 'Razan Al-Student',
@@ -510,17 +522,30 @@
   }
 
   function renderSummary() {
-    const userNameEl = document.querySelector('.user-name');
+    const userNameEl = document.getElementById('userName');
+    const userRoleEl = document.getElementById('userRole');
+    const userEmailEl = document.getElementById('userEmail');
+    const userIdEl = document.getElementById('userId');
+    const userLevelEl = document.getElementById('userLevel');
     const avatarInitial = document.getElementById('avatarInitial');
     const avatarImage = document.getElementById('avatarImage');
-    const metaLines = document.querySelectorAll('.user-meta');
-    const emailMetaEl = Array.from(metaLines).find(el =>
-      el.textContent.trim().startsWith('Email:')
-    );
 
-    if (userNameEl) userNameEl.textContent = profile.fullName;
-    if (emailMetaEl) emailMetaEl.textContent = 'Email: ' + profile.email;
+    // Display user data
+    if (currentUser) {
+      userNameEl.textContent = currentUser.name || 'Demo User';
+      userRoleEl.textContent = `CCSIT Student · ${currentUser.major || 'Computer Science'}`;
+      userEmailEl.textContent = `Email: ${currentUser.email || 'demo@ccsit.edu.sa'}`;
+      userIdEl.textContent = `ID: ${currentUser.studentId || '44123456'}`;
+      userLevelEl.textContent = `Level: ${currentUser.level || '3'}rd level`;
+    } else {
+      userNameEl.textContent = 'Demo User';
+      userRoleEl.textContent = 'CCSIT Student · Computer Science';
+      userEmailEl.textContent = 'Email: demo@ccsit.edu.sa';
+      userIdEl.textContent = 'ID: 44123456';
+      userLevelEl.textContent = 'Level: 3rd level';
+    }
 
+    // Handle avatar
     if (profile.avatar && avatarImage) {
       avatarImage.src = profile.avatar;
       avatarImage.style.display = 'block';
@@ -529,14 +554,19 @@
       if (avatarImage) avatarImage.style.display = 'none';
       if (avatarInitial) {
         avatarInitial.style.display = 'flex';
-        avatarInitial.textContent = profile.fullName
-          ? profile.fullName.charAt(0).toUpperCase()
-          : 'U';
+        const name = currentUser ? currentUser.name : 'Demo User';
+        avatarInitial.textContent = name ? name.charAt(0).toUpperCase() : 'D';
       }
     }
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    // Check if user is logged in
+    if (!localStorage.getItem('isLoggedIn')) {
+      window.location.href = 'login.html';
+      return;
+    }
+
     loadProfile();
 
     // زر تغيير الصورة
@@ -681,17 +711,45 @@
       const bioInput = document.getElementById('bio');
       const deptSelect = document.getElementById('department');
 
-      if (fullNameInput) fullNameInput.value = profile.fullName;
-      if (emailInput) emailInput.value = profile.email;
+      // Populate form with current user data
+      if (fullNameInput) fullNameInput.value = currentUser ? currentUser.name : profile.fullName;
+      if (emailInput) emailInput.value = currentUser ? currentUser.email : profile.email;
       if (bioInput) bioInput.value = profile.bio || '';
       if (deptSelect) deptSelect.value = profile.department;
 
       form.addEventListener('submit', e => {
         e.preventDefault();
-        profile.fullName = fullNameInput.value.trim() || profile.fullName;
-        profile.email = emailInput.value.trim() || profile.email;
+        const newName = fullNameInput.value.trim();
+        const newEmail = emailInput.value.trim();
+
+        // Update profile data
+        profile.fullName = newName || profile.fullName;
+        profile.email = newEmail || profile.email;
         profile.bio = bioInput.value.trim();
         profile.department = deptSelect.value;
+
+        // Update currentUser data
+        if (currentUser) {
+          currentUser.name = newName || currentUser.name;
+          currentUser.email = newEmail || currentUser.email;
+          localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+          // Also update the main userData if it exists
+          const storedUserData = localStorage.getItem('userData');
+          if (storedUserData) {
+            try {
+              const userData = JSON.parse(storedUserData);
+              if (userData.email === currentUser.email) {
+                userData.name = currentUser.name;
+                userData.email = currentUser.email;
+                localStorage.setItem('userData', JSON.stringify(userData));
+              }
+            } catch (e) {
+              console.error('Error updating userData:', e);
+            }
+          }
+        }
+
         saveProfile();
         renderSummary();
         alert('Profile updated.');
@@ -716,13 +774,35 @@
           alert('New passwords do not match.');
           return;
         }
-        // ديمو: نخزنها في المتصفح فقط
+
+        // Update password in profile
         profile.password = newInput.value;
         saveProfile();
+
+        // Update password in currentUser and userData
+        if (currentUser) {
+          currentUser.password = newInput.value;
+          localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+          // Also update the main userData if it exists
+          const storedUserData = localStorage.getItem('userData');
+          if (storedUserData) {
+            try {
+              const userData = JSON.parse(storedUserData);
+              if (userData.email === currentUser.email) {
+                userData.password = currentUser.password;
+                localStorage.setItem('userData', JSON.stringify(userData));
+              }
+            } catch (e) {
+              console.error('Error updating userData password:', e);
+            }
+          }
+        }
+
         currentInput.value = '';
         newInput.value = '';
         confirmInput.value = '';
-        alert('Password updated (saved in browser only).');
+        alert('Password updated successfully.');
       });
     }
 
@@ -773,11 +853,42 @@
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
         localStorage.removeItem('isLoggedIn');
-        window.location.href = 'index.html';
+        localStorage.removeItem('currentUser');
+        window.location.href = 'login.html';
       });
     }
   });
 </script>
+
+<!-- AI Assistant Widget -->
+<button id="ai-toggle-button" class="ai-floating-button" aria-label="Open AI assistant">
+  💬
+</button>
+
+<div id="ai-assistant-widget">
+  <div class="ai-widget-header">
+    <div class="ai-widget-title">
+      <h2>CCSIT AI Assistant</h2>
+      <span>اسألي عن أي شيء يخص الجامعة أو CCSIT</span>
+    </div>
+    <span class="ai-widget-badge">Beta</span>
+    <button id="ai-close-button" class="ai-close">&times;</button>
+  </div>
+
+  <div class="ai-messages" id="ai-messages"></div>
+
+  <form class="ai-input-row" id="ai-chat-form">
+    <input
+      id="ai-question-input"
+      type="text"
+      placeholder="اكتبي سؤالك هنا…"
+      autocomplete="off"
+    />
+    <button id="ai-send-btn" type="submit">إرسال</button>
+  </form>
+</div>
+
+<script src="ai-widget.js"></script>
 
 </body>
 </html>
