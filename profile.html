@@ -471,20 +471,84 @@
     </footer>
 
   </div>
+<script>
+  // مفتاح التخزين في المتصفح
+  const STORAGE_KEY = 'ccsit_profile';
 
-  <script>
+  // قيم افتراضية
+  let profile = {
+    fullName: 'Razan Al-Student',
+    email: 'razan.students@ccsit.edu.sa',
+    bio: '',
+    department: 'Information Technology',
+    avatar: null, // صورة (Base64)
+    privacy: {
+      showName: true,
+      showCommunities: true,
+      showEmail: false
+    },
+    password: null // مخزنة في المتصفح فقط (للديمو)
+  };
+
+  function loadProfile() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+    try {
+      const data = JSON.parse(saved);
+      profile = {
+        ...profile,
+        ...data,
+        privacy: { ...profile.privacy, ...(data.privacy || {}) }
+      };
+    } catch (e) {
+      console.error('Invalid saved profile', e);
+    }
+  }
+
+  function saveProfile() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+  }
+
+  function renderSummary() {
+    const userNameEl = document.querySelector('.user-name');
+    const avatarInitial = document.getElementById('avatarInitial');
+    const avatarImage = document.getElementById('avatarImage');
+    const metaLines = document.querySelectorAll('.user-meta');
+    const emailMetaEl = Array.from(metaLines).find(el =>
+      el.textContent.trim().startsWith('Email:')
+    );
+
+    if (userNameEl) userNameEl.textContent = profile.fullName;
+    if (emailMetaEl) emailMetaEl.textContent = 'Email: ' + profile.email;
+
+    if (profile.avatar && avatarImage) {
+      avatarImage.src = profile.avatar;
+      avatarImage.style.display = 'block';
+      if (avatarInitial) avatarInitial.style.display = 'none';
+    } else {
+      if (avatarImage) avatarImage.style.display = 'none';
+      if (avatarInitial) {
+        avatarInitial.style.display = 'flex';
+        avatarInitial.textContent = profile.fullName
+          ? profile.fullName.charAt(0).toUpperCase()
+          : 'U';
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadProfile();
+
     // زر تغيير الصورة
     const changePhotoBtn = document.getElementById('changePhotoBtn');
     const avatarInput = document.getElementById('avatarInput');
-    const avatarImage = document.getElementById('avatarImage');
-    const avatarInitial = document.getElementById('avatarInitial');
 
     if (changePhotoBtn && avatarInput) {
       changePhotoBtn.addEventListener('click', () => {
         avatarInput.click();
       });
 
-      avatarInput.addEventListener('change', (event) => {
+      avatarInput.addEventListener('change', event => {
         const file = event.target.files[0];
         if (!file) return;
 
@@ -494,31 +558,29 @@
         }
 
         const reader = new FileReader();
-        reader.onload = function(e) {
-          avatarImage.src = e.target.result;
-          avatarImage.style.display = 'block';
-          avatarInitial.style.display = 'none';
+        reader.onload = function (e) {
+          profile.avatar = e.target.result;
+          saveProfile();
+          renderSummary();
         };
         reader.readAsDataURL(file);
       });
     }
 
-    // محتوى النماذج لكل قسم
+    // محتوى النماذج لكل قسم (بدون onsubmit/onclick داخل HTML)
     const sectionsHTML = {
       'edit-profile': `
-        <form class="settings-form" onsubmit="event.preventDefault(); alert('Profile updated (demo).');">
+        <form class="settings-form">
           <div class="settings-field">
             <label class="settings-label" for="fullName">Full name</label>
             <input id="fullName" class="settings-input" type="text"
-                   placeholder="Enter your full name"
-                   value="Razan Al-Student" />
+                   placeholder="Enter your full name" />
           </div>
 
           <div class="settings-field">
             <label class="settings-label" for="email">University email</label>
             <input id="email" class="settings-input" type="email"
-                   placeholder="example@ccsit.edu.sa"
-                   value="razan.students@ccsit.edu.sa" />
+                   placeholder="example@ccsit.edu.sa" />
             <div class="settings-note">
               Please use your official CCSIT university email.
             </div>
@@ -549,7 +611,7 @@
         </form>
       `,
       'change-password': `
-        <form class="settings-form" onsubmit="event.preventDefault(); alert('Password updated (demo).');">
+        <form class="settings-form">
           <div class="settings-field">
             <label class="settings-label" for="currentPassword">Current password</label>
             <input id="currentPassword" class="settings-input" type="password"
@@ -581,11 +643,11 @@
           <div class="settings-field">
             <span class="settings-label">Profile visibility</span>
             <div class="privacy-option">
-              <input type="checkbox" id="showName" checked />
+              <input type="checkbox" id="showName" />
               <label for="showName">Allow other CCSIT students to see my name.</label>
             </div>
             <div class="privacy-option">
-              <input type="checkbox" id="showCommunities" checked />
+              <input type="checkbox" id="showCommunities" />
               <label for="showCommunities">Show communities I have joined.</label>
             </div>
             <div class="privacy-option">
@@ -599,8 +661,7 @@
           </div>
 
           <div class="settings-actions">
-            <button type="button" class="btn-save"
-                    onclick="alert('Privacy settings saved (demo).');">
+            <button type="button" class="btn-save" id="savePrivacyBtn">
               Save preferences
             </button>
           </div>
@@ -611,56 +672,112 @@
     const settingsItems = document.querySelectorAll('.settings-item');
     const settingsContent = document.getElementById('settingsContent');
 
+    function setupEditProfileForm() {
+      const form = settingsContent.querySelector('form');
+      if (!form) return;
+
+      const fullNameInput = document.getElementById('fullName');
+      const emailInput = document.getElementById('email');
+      const bioInput = document.getElementById('bio');
+      const deptSelect = document.getElementById('department');
+
+      if (fullNameInput) fullNameInput.value = profile.fullName;
+      if (emailInput) emailInput.value = profile.email;
+      if (bioInput) bioInput.value = profile.bio || '';
+      if (deptSelect) deptSelect.value = profile.department;
+
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        profile.fullName = fullNameInput.value.trim() || profile.fullName;
+        profile.email = emailInput.value.trim() || profile.email;
+        profile.bio = bioInput.value.trim();
+        profile.department = deptSelect.value;
+        saveProfile();
+        renderSummary();
+        alert('Profile updated.');
+      });
+    }
+
+    function setupPasswordForm() {
+      const form = settingsContent.querySelector('form');
+      if (!form) return;
+
+      const currentInput = document.getElementById('currentPassword');
+      const newInput = document.getElementById('newPassword');
+      const confirmInput = document.getElementById('confirmPassword');
+
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        if (!newInput.value || newInput.value.length < 6) {
+          alert('Please use a longer password (at least 6 characters).');
+          return;
+        }
+        if (newInput.value !== confirmInput.value) {
+          alert('New passwords do not match.');
+          return;
+        }
+        // ديمو: نخزنها في المتصفح فقط
+        profile.password = newInput.value;
+        saveProfile();
+        currentInput.value = '';
+        newInput.value = '';
+        confirmInput.value = '';
+        alert('Password updated (saved in browser only).');
+      });
+    }
+
+    function setupPrivacyForm() {
+      const showName = document.getElementById('showName');
+      const showCommunities = document.getElementById('showCommunities');
+      const showEmail = document.getElementById('showEmail');
+      const saveBtn = document.getElementById('savePrivacyBtn');
+
+      if (showName) showName.checked = profile.privacy.showName;
+      if (showCommunities) showCommunities.checked = profile.privacy.showCommunities;
+      if (showEmail) showEmail.checked = profile.privacy.showEmail;
+
+      if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+          profile.privacy.showName = showName.checked;
+          profile.privacy.showCommunities = showCommunities.checked;
+          profile.privacy.showEmail = showEmail.checked;
+          saveProfile();
+          alert('Privacy settings saved.');
+        });
+      }
+    }
+
+    function showSection(key) {
+      settingsContent.innerHTML = sectionsHTML[key];
+      if (key === 'edit-profile') setupEditProfileForm();
+      else if (key === 'change-password') setupPasswordForm();
+      else if (key === 'privacy-security') setupPrivacyForm();
+    }
+
+    // تفعيل الضغط على العناصر
     settingsItems.forEach(item => {
       item.addEventListener('click', () => {
         settingsItems.forEach(i => i.classList.remove('active'));
         item.classList.add('active');
-
         const sectionKey = item.getAttribute('data-section');
-        settingsContent.innerHTML = sectionsHTML[sectionKey];
+        showSection(sectionKey);
       });
     });
 
-    // زر تسجيل الخروج (لو تستخدمون localStorage للدخول)
+    // أول مرة نعرض قسم تعديل البروفايل
+    showSection('edit-profile');
+    renderSummary();
+
+    // زر تسجيل الخروج
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('isLoggedIn'); // لو حابين تستخدمونه
+        localStorage.removeItem('isLoggedIn');
         window.location.href = 'index.html';
       });
     }
-  </script>
-<!-- AI Assistant Widget -->
-<link rel="stylesheet" href="ai-widget.css" />
-
-<button id="ai-toggle-button" class="ai-floating-button" aria-label="Open AI assistant">
-  💬
-</button>
-
-<div id="ai-assistant-widget">
-  <div class="ai-widget-header">
-    <div class="ai-widget-title">
-      <h2>CCSIT AI Assistant</h2>
-      <span>اسألي عن أي شيء يخص الجامعة أو CCSIT</span>
-    </div>
-    <span class="ai-widget-badge">Beta</span>
-    <button id="ai-close-button" class="ai-close">&times;</button>
-  </div>
-
-  <div class="ai-messages" id="ai-messages"></div>
-
-  <form class="ai-input-row" id="ai-chat-form">
-    <input
-      id="ai-question-input"
-      type="text"
-      placeholder="اكتبي سؤالك هنا…"
-      autocomplete="off"
-    />
-    <button id="ai-send-btn" type="submit">إرسال</button>
-  </form>
-</div>
-
-<script src="ai-widget.js"></script>
+  });
+</script>
 
 </body>
 </html>
