@@ -264,7 +264,9 @@
           </p>
 
           <div class="hero-actions">
-            <button class="btn btn-primary">Ask a Question</button>
+           <button class="btn btn-primary" onclick="openAIWidget()">
+  Ask a Question
+</button>
             <button class="btn btn-secondary" onclick="window.location.href='./map.html'">
               Open Campus Map
             </button>
@@ -309,5 +311,47 @@
       © 2025 CCSIT UniTy Team
     </footer>
   </div>
+  <!-- OPEN AI WIDGET FUNCTION -->
+<script>
+  function openAIWidget() {
+    const widget = document.getElementById("ai-assistant-widget");
+    widget.classList.add("open");
+
+    const input = document.getElementById("ai-question-input");
+    if (input) input.focus();
+  }
+</script>
+
+  <!-- AI Assistant Widget -->
+<link rel="stylesheet" href="ai-widget.css" />
+
+<button id="ai-toggle-button" class="ai-floating-button" aria-label="Open AI assistant">
+  💬
+</button>
+
+<div id="ai-assistant-widget">
+  <div class="ai-widget-header">
+    <div class="ai-widget-title">
+      <h2>CCSIT AI Assistant</h2>
+      <span>اسألي عن أي شيء يخص الجامعة أو CCSIT</span>
+    </div>
+    <span class="ai-widget-badge">Beta</span>
+    <button id="ai-close-button" class="ai-close">&times;</button>
+  </div>
+
+  <div class="ai-messages" id="ai-messages"></div>
+
+  <form class="ai-input-row" id="ai-chat-form">
+    <input
+      id="ai-question-input"
+      type="text"
+      placeholder="اكتبي سؤالك هنا…"
+      autocomplete="off"
+    />
+    <button id="ai-send-btn" type="submit">إرسال</button>
+  </form>
+</div>
+
+<script src="ai-widget.js"></script>
 </body>
 </html>
